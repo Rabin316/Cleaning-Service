@@ -1,0 +1,27 @@
+<!-- templates/cleaning/booking_success.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}Booking Confirmed - Clean Pro Services{% endblock %}
+
+{% block content %}
+<section style="padding: 100px 0; text-align: center;">
+    <div class="container">
+        <div class="success-icon mb-4">
+            <i class="fas fa-check-circle" style="font-size: 6rem; color: var(--secondary-color);"></i>
+        </div>
+        <h1 class="mb-3">Booking Confirmed!</h1>
+        <p class="lead mb-4">Thank you for choosing Clean Pro Services. We've received your booking request.</p>
+        <p>Our team will contact you shortly to confirm your appointment details.</p>
+        <div class="mt-5">
+            <a href="{% url 'home' %}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-home me-2"></i>Back to Home
+            </a>
+            <a href="{% url 'services' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-list me-2"></i>View Services
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

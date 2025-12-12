@@ -1,0 +1,257 @@
+<!-- templates/cleaning/service_detail.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}{{ service.name }} - Clean Pro Services{% endblock %}
+
+{% block extra_css %}
+<style>
+    .service-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .service-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 50%;
+        height: 100%;
+        background: rgba(255,255,255,0.05);
+        transform: skewX(-10deg);
+    }
+    
+    .service-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .service-icon-large {
+        font-size: 8rem;
+        opacity: 0.3;
+        position: absolute;
+        right: 10%;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .service-details {
+        padding: 60px 0;
+    }
+    
+    .service-info-box {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 100px;
+    }
+    
+    .price-box {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .price-box .price {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .price-box .price-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .feature-list li {
+        padding: 1rem;
+        border-bottom: 1px solid var(--light-color);
+        display: flex;
+        align-items: center;
+    }
+    
+    .feature-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .feature-list li i {
+        color: var(--secondary-color);
+        margin-right: 1rem;
+        font-size: 1.2rem;
+        min-width: 20px;
+    }
+    
+    .related-services {
+        padding: 60px 0;
+        background: var(--light-color);
+    }
+    
+    .related-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        height: 100%;
+    }
+    
+    .related-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .related-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Service Hero -->
+<section class="service-hero">
+    <div class="container">
+        <div class="service-hero-content">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="display-4 mb-3">{{ service.name }}</h1>
+                    <p class="lead">{{ service.short_description }}</p>
+                    <div class="d-flex align-items-center gap-4 mt-4">
+                        <div>
+                            <i class="far fa-clock me-2"></i>
+                            <strong>Duration:</strong> {{ service.duration }}
+                        </div>
+                        <div>
+                            <i class="fas fa-tag me-2"></i>
+                            <strong>From:</strong> ${{ service.price_starting }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <i class="{{ service.icon }} service-icon-large"></i>
+    </div>
+</section>
+
+<!-- Service Details -->
+<section class="service-details">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="bg-white rounded-3 p-4 shadow-sm mb-4">
+                    <h2 class="mb-4">Service Description</h2>
+                    <p style="white-space: pre-line;">{{ service.description }}</p>
+                </div>
+                
+                <div class="bg-white rounded-3 p-4 shadow-sm">
+                    <h2 class="mb-4">What's Included</h2>
+                    <ul class="feature-list">
+                        {% for feature in service.features.splitlines %}
+                            {% if feature %}
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span>{{ feature }}</span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="service-info-box">
+                    <div class="price-box">
+                        <div class="price">${{ service.price_starting }}</div>
+                        <div class="price-label">Starting Price</div>
+                    </div>
+                    
+                    <a href="{% url 'booking' %}" class="btn btn-primary w-100 mb-3 py-3">
+                        <i class="fas fa-calendar-check me-2"></i>Book This Service
+                    </a>
+                    
+                    <a href="{% url 'contact' %}" class="btn btn-outline-primary w-100 py-3">
+                        <i class="fas fa-question-circle me-2"></i>Ask a Question
+                    </a>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3">Need Help?</h5>
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-phone me-2"></i>+1 (555) 123-4567
+                    </p>
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-envelope me-2"></i>info@cleanpro.com
+                    </p>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-clock me-2"></i>Mon-Sat: 8AM-6PM
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Services -->
+{% if related_services %}
+<section class="related-services">
+    <div class="container">
+        <h2 class="text-center mb-5">You Might Also Like</h2>
+        <div class="row g-4">
+            {% for related in related_services %}
+            <div class="col-lg-4">
+                <div class="related-card">
+                    <div class="related-icon">
+                        <i class="{{ related.icon }}"></i>
+                    </div>
+                    <h4>{{ related.name }}</h4>
+                    <p class="text-muted mb-3">{{ related.short_description|truncatewords:15 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-primary fw-bold">From ${{ related.price_starting }}</span>
+                        <a href="{% url 'service_detail' related.slug %}" class="btn btn-sm btn-outline-primary">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section style="background: var(--dark-color); color: white; padding: 60px 0; text-align: center;">
+    <div class="container">
+        <h2 class="mb-4">Ready to Get Started?</h2>
+        <p class="lead mb-4">Book your {{ service.name }} service today and experience the Clean Pro difference!</p>
+        <a href="{% url 'booking' %}" class="btn btn-primary btn-lg me-3">
+            <i class="fas fa-calendar-check me-2"></i>Book Now
+        </a>
+        <a href="{% url 'services' %}" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-list me-2"></i>All Services
+        </a>
+    </div>
+</section>
+{% endblock %}

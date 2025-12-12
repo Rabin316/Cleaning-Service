@@ -1,0 +1,188 @@
+<!-- templates/cleaning/services.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}Our Services - Clean Pro Services{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 80px 0 60px;
+        text-align: center;
+    }
+    
+    .page-header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .services-grid {
+        padding: 60px 0;
+    }
+    
+    .service-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .service-image {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .service-image i {
+        font-size: 5rem;
+        color: white;
+        opacity: 0.9;
+    }
+    
+    .service-content {
+        padding: 2rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .service-content h3 {
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+    }
+    
+    .service-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--light-color);
+    }
+    
+    .service-price {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .service-duration {
+        color: #64748b;
+        display: flex;
+        align-items: center;
+    }
+    
+    .service-duration i {
+        margin-right: 0.5rem;
+    }
+    
+    .features-list {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+    }
+    
+    .features-list li {
+        padding: 0.5rem 0;
+        color: #64748b;
+    }
+    
+    .features-list li i {
+        color: var(--secondary-color);
+        margin-right: 0.5rem;
+    }
+    
+    .service-actions {
+        margin-top: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>Our Cleaning Services</h1>
+        <p class="lead">Professional cleaning solutions tailored to your needs</p>
+    </div>
+</section>
+
+<!-- Services Grid -->
+<section class="services-grid">
+    <div class="container">
+        <div class="row g-4">
+            {% for service in services %}
+            <div class="col-lg-4 col-md-6">
+                <div class="service-card">
+                    <div class="service-image">
+                        <i class="{{ service.icon }}"></i>
+                    </div>
+                    <div class="service-content">
+                        <h3>{{ service.name }}</h3>
+                        <div class="service-meta">
+                            <div class="service-price">From ${{ service.price_starting }}</div>
+                            <div class="service-duration">
+                                <i class="far fa-clock"></i>
+                                {{ service.duration }}
+                            </div>
+                        </div>
+                        <p>{{ service.short_description }}</p>
+                        <ul class="features-list">
+                            {% for feature in service.features.splitlines %}
+                                {% if feature %}
+                                <li><i class="fas fa-check-circle"></i> {{ feature }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <div class="service-actions">
+                            <a href="{% url 'service_detail' service.slug %}" class="btn btn-outline-primary w-100 mb-2">
+                                View Details
+                            </a>
+                            <a href="{% url 'booking' %}" class="btn btn-primary w-100">
+                                Book This Service
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-broom" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                <h3>No Services Available</h3>
+                <p>Please check back later for our cleaning services.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section style="background: var(--light-color); padding: 60px 0;">
+    <div class="container text-center">
+        <h2 class="mb-4">Need a Custom Cleaning Solution?</h2>
+        <p class="lead mb-4">We offer customized cleaning packages to meet your specific requirements.</p>
+        <a href="{% url 'contact' %}" class="btn btn-primary btn-lg me-3">
+            <i class="fas fa-envelope me-2"></i>Contact Us
+        </a>
+        <a href="{% url 'booking' %}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-calendar me-2"></i>Book Now
+        </a>
+    </div>
+</section>
+{% endblock %}
