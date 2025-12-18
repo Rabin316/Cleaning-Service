@@ -1,7 +1,7 @@
 <!-- templates/cleaning/booking.html -->
 {% extends 'cleaning/base.html' %}
 
-{% block title %}Book a Service - Clean Pro Services{% endblock %}
+{% block title %}Book a Service - Clean Pro{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -98,6 +98,40 @@
         font-size: 1.1rem;
         font-weight: 600;
         border-radius: 10px;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 60px 0 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+        }
+        
+        .booking-section {
+            padding: 40px 0;
+        }
+        
+        .booking-form {
+            padding: 1.5rem;
+        }
+        
+        .booking-info {
+            position: static;
+            margin-top: 2rem;
+            background: var(--light-color);
+        }
+        
+        .info-card {
+            margin-bottom: 1rem;
+        }
+        
+        .submit-btn {
+            padding: 0.875rem;
+            font-size: 1rem;
+        }
+    }
     }
 </style>
 {% endblock %}

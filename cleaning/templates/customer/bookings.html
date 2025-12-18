@@ -1,0 +1,404 @@
+<!-- templates/cleaning/customer/bookings.html -->
+{% extends 'cleaning/base.html' %}
+{% block title %}My Bookings - Clean Pro{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            font-size: 1.5rem;
+        }
+        
+        .d-flex.justify-content-between.align-items-center.mb-4 {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 1rem;
+        }
+        
+        .nav.nav-pills {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .nav-link {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        .card {
+            margin-bottom: 1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .d-flex.gap-2 {
+            flex-direction: column;
+            gap: 0.5rem !important;
+        }
+        
+        .btn.btn-sm {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>My Bookings</h1>
+            <a href="{% url 'customer_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+        
+        <!-- Filter Tabs -->
+        <ul class="nav nav-pills mb-4">
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'all' %}active{% endif %}" href="?status=all">All</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'pending' %}active{% endif %}" href="?status=pending">Pending</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'confirmed' %}active{% endif %}" href="?status=confirmed">Confirmed</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'completed' %}active{% endif %}" href="?status=completed">Completed</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if status_filter == 'cancelled' %}active{% endif %}" href="?status=cancelled">Cancelled</a>
+            </li>
+        </ul>
+        
+        <!-- Upcoming Bookings -->
+        {% if upcoming_bookings %}
+        <h3 class="mb-3">Upcoming</h3>
+        <div class="row g-3 mb-5">
+            {% for booking in upcoming_bookings %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title">{{ booking.service.name }}</h5>
+                            <span class="badge bg-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                        </div>
+                        <p class="mb-2"><i class="far fa-calendar me-2"></i>{{ booking.preferred_date|date:"F d, Y" }}</p>
+                        <p class="mb-2"><i class="far fa-clock me-2"></i>{{ booking.preferred_time|time:"g:i A" }}</p>
+                        <p class="mb-3"><i class="fas fa-map-marker-alt me-2"></i>{{ booking.address|truncatewords:10 }}</p>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-primary">View Details</a>
+                            {% if booking.status in 'pending,confirmed' %}
+                            <form method="post" action="{% url 'cancel_booking' booking.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Cancel</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Past Bookings -->
+        {% if past_bookings %}
+        <h3 class="mb-3">Past Bookings</h3>
+        <div class="row g-3">
+            {% for booking in past_bookings %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title">{{ booking.service.name }}</h5>
+                            <span class="badge bg-secondary">{{ booking.get_status_display }}</span>
+                        </div>
+                        <p class="mb-2"><i class="far fa-calendar me-2"></i>{{ booking.preferred_date|date:"F d, Y" }}</p>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                            {% if booking.status == 'completed' %}
+                            <form method="post" action="{% url 'rebook' booking.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">Rebook</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if not upcoming_bookings and not past_bookings %}
+        <div class="text-center py-5">
+            <i class="far fa-calendar-times" style="font-size: 4rem; color: #cbd5e1;"></i>
+            <h3 class="mt-3">No bookings found</h3>
+            <p class="text-muted">Start by booking your first cleaning service!</p>
+            <a href="{% url 'services' %}" class="btn btn-primary mt-3">Browse Services</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+
+<!-- templates/cleaning/customer/booking_detail.html -->
+{% extends 'cleaning/base.html' %}
+{% block title %}Booking #{{ booking.id }} - Clean Pro{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Booking #{{ booking.id }}</h4>
+                        <span class="badge bg-{{ booking.status }} px-3 py-2">{{ booking.get_status_display }}</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="mb-3">{{ booking.service.name }}</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong><i class="far fa-calendar me-2"></i>Date:</strong> {{ booking.preferred_date|date:"F d, Y" }}</p>
+                                <p><strong><i class="far fa-clock me-2"></i>Time:</strong> {{ booking.preferred_time|time:"g:i A" }}</p>
+                                <p><strong><i class="fas fa-sync me-2"></i>Frequency:</strong> {{ booking.get_frequency_display }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-user me-2"></i>Customer:</strong> {{ booking.name }}</p>
+                                <p><strong><i class="fas fa-envelope me-2"></i>Email:</strong> {{ booking.email }}</p>
+                                <p><strong><i class="fas fa-phone me-2"></i>Phone:</strong> {{ booking.phone }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p><strong><i class="fas fa-map-marker-alt me-2"></i>Address:</strong></p>
+                            <p class="ps-4">{{ booking.address }}</p>
+                        </div>
+                        
+                        {% if booking.special_instructions %}
+                        <div class="mb-3">
+                            <p><strong><i class="fas fa-sticky-note me-2"></i>Special Instructions:</strong></p>
+                            <p class="ps-4">{{ booking.special_instructions }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if booking.assigned_to %}
+                        <div class="mb-3">
+                            <p><strong><i class="fas fa-user-tie me-2"></i>Assigned To:</strong> {{ booking.assigned_to.name }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if booking.amount %}
+                        <div class="alert alert-info">
+                            <strong>Amount:</strong> ${{ booking.amount }}
+                            <br><strong>Payment Status:</strong> {{ booking.get_payment_status_display }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            {% if can_cancel %}
+                            <form method="post" action="{% url 'cancel_booking' booking.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel?')">
+                                    <i class="fas fa-times me-2"></i>Cancel Booking
+                                </button>
+                            </form>
+                            {% endif %}
+                            
+                            {% if booking.status == 'completed' %}
+                            <form method="post" action="{% url 'rebook' booking.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-redo me-2"></i>Rebook This Service
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Review Section -->
+                {% if can_review %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Leave a Review</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ review_form.as_p }}
+                            <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
+                    </div>
+                </div>
+                {% elif booking.customer_rating %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Your Review</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= booking.customer_rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p>{{ booking.customer_review }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Service Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Service:</strong> {{ booking.service.name }}</p>
+                        <p><strong>Duration:</strong> {{ booking.service.duration }}</p>
+                        <p><strong>Base Price:</strong> ${{ booking.service.price_starting }}</p>
+                        <hr>
+                        <p class="mb-2"><strong>Booking Timeline:</strong></p>
+                        <p class="small text-muted">Created: {{ booking.created_at|date:"M d, Y g:i A" }}</p>
+                        <p class="small text-muted">Last Updated: {{ booking.updated_at|date:"M d, Y g:i A" }}</p>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Need Help?</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="small">If you have questions about your booking, please contact us:</p>
+                        <p class="small mb-1"><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</p>
+                        <p class="small"><i class="fas fa-envelope me-2"></i>support@cleanpro.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+<!-- templates/cleaning/customer/profile.html -->
+{% extends 'cleaning/base.html' %}
+{% block title %}My Profile - Clean Pro{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="mb-4">My Profile</h1>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Personal Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <h6 class="mb-3">Account Details</h6>
+                            {{ user_form.as_p }}
+                            
+                            <hr class="my-4">
+                            
+                            <h6 class="mb-3">Profile Details</h6>
+                            {{ profile_form.as_p }}
+                            
+                            <button type="submit" class="btn btn-primary mt-3">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Profile Summary</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="profile-avatar mb-3" style="width:100px; height:100px; border-radius:50%; background:var(--primary-color); color:white; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto;">
+                            {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+                        </div>
+                        <h5>{{ user.get_full_name }}</h5>
+                        <p class="text-muted">{{ user.email }}</p>
+                        <hr>
+                        <p class="small mb-1">Member Since</p>
+                        <p class="fw-bold">{{ user.date_joined|date:"F Y" }}</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Quick Stats</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Bookings:</span>
+                            <strong>{{ profile.total_bookings }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Total Spent:</span>
+                            <strong>${{ profile.total_spent }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+<!-- templates/cleaning/customer/dashboard.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}Dashboard - Clean Pro{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Welcome to Your Dashboard, {{ user.first_name }}!</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Bookings</h5>
+                                    <h2 class="text-primary">{{ profile.total_bookings }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Spent</h5>
+                                    <h2 class="text-success">${{ profile.total_spent }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <a href="{% url 'customer_bookings' %}" class="btn btn-primary btn-block w-100">
+                                <i class="fas fa-calendar"></i> My Bookings
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'customer_profile' %}" class="btn btn-info btn-block w-100">
+                                <i class="fas fa-user"></i> Edit Profile
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{% url 'customer_logout' %}" class="btn btn-danger btn-block w-100">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

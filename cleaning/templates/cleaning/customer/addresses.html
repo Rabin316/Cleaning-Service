@@ -1,0 +1,53 @@
+<!-- templates/cleaning/customer/addresses.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}Saved Addresses - Clean Pro{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Saved Addresses</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-8">
+            {% if addresses %}
+            {% for address in addresses %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>{{ address.label }}</h5>
+                    <p>{{ address.address }}<br>{{ address.city }}, {{ address.state }} {{ address.zip_code }}</p>
+                    {% if address.is_default %}<span class="badge bg-success">Default</span>{% endif %}
+                </div>
+                <div class="card-footer d-flex gap-2">
+                    {% if not address.is_default %}
+                    <form method="post" action="{% url 'set_default_address' address.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Set as Default</button>
+                    </form>
+                    {% endif %}
+                    <form method="post" action="{% url 'delete_address' address.id %}" style="display:inline;" onsubmit="return confirm('Delete this address?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="alert alert-info">No saved addresses yet.</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Add New Address</div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary w-100">Save Address</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

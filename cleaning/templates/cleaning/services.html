@@ -1,7 +1,7 @@
 <!-- templates/cleaning/services.html -->
 {% extends 'cleaning/base.html' %}
 
-{% block title %}Our Services - Clean Pro Services{% endblock %}
+{% block title %}Our Services - Clean Pro{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -52,6 +52,12 @@
         font-size: 5rem;
         color: white;
         opacity: 0.9;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    
+    .service-card:hover .service-image i {
+        transform: scale(1.15) rotate(5deg);
+        opacity: 1;
     }
     
     .service-content {
@@ -98,7 +104,37 @@
         flex-grow: 1;
     }
     
-    .features-list li {
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 60px 0 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+        }
+        
+        .services-grid {
+            padding: 40px 0;
+        }
+        
+        .service-image {
+            height: 150px;
+        }
+        
+        .service-image i {
+            font-size: 3rem;
+        }
+        
+        .service-content {
+            padding: 1.5rem;
+        }
+        
+        .service-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }.features-list li {
         padding: 0.5rem 0;
         color: #64748b;
     }
@@ -114,6 +150,7 @@
 </style>
 {% endblock %}
 
+{% load icon_utils %}
 {% block content %}
 <!-- Page Header -->
 <section class="page-header">
@@ -131,7 +168,7 @@
             <div class="col-lg-4 col-md-6">
                 <div class="service-card">
                     <div class="service-image">
-                        <i class="{{ service.icon }}"></i>
+                        <i class="{{ service.icon|normalize_icon }}"></i>
                     </div>
                     <div class="service-content">
                         <h3>{{ service.name }}</h3>

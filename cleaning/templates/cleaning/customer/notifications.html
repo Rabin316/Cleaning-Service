@@ -1,0 +1,29 @@
+<!-- templates/cleaning/customer/notifications.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}Notifications - Clean Pro{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Notifications</h2>
+    
+    {% if notifications %}
+    <div class="list-group">
+        {% for notification in notifications %}
+        <div class="list-group-item {% if not notification.is_read %}bg-light{% endif %}">
+            <div class="d-flex justify-content-between">
+                <h5>{{ notification.title }}</h5>
+                {% if not notification.is_read %}
+                <span class="badge bg-primary">New</span>
+                {% endif %}
+            </div>
+            <p class="mb-1">{{ notification.message }}</p>
+            <small class="text-muted">{{ notification.created_at }}</small>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">No notifications yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

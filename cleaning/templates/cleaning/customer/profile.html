@@ -1,0 +1,249 @@
+<!-- templates/cleaning/customer/profile.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}My Profile - Clean Pro{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .row {
+            flex-direction: column;
+        }
+        
+        .col-lg-8, 
+        .col-lg-4,
+        .col-md-8,
+        .col-md-4,
+        .col-md-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header h5 {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .btn,
+        button.btn {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            font-size: 1.5rem;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100% !important;
+            margin-bottom: 0.75rem !important;
+            font-size: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .container.my-5 {
+            padding: 1rem;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        h6 {
+            font-size: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>My Profile</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Edit Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in user_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if profile_form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in profile_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- User Form Fields -->
+                        <fieldset class="mb-4">
+                            <legend class="h6 mb-3">Account Information</legend>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">First Name</label>
+                                    {{ user_form.first_name }}
+                                    {% if user_form.first_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in user_form.first_name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Last Name</label>
+                                    {{ user_form.last_name }}
+                                    {% if user_form.last_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in user_form.last_name.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                {{ user_form.email }}
+                                {% if user_form.email.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in user_form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </fieldset>
+                        
+                        <!-- Customer Profile Form Fields -->
+                        <fieldset>
+                            <legend class="h6 mb-3">Contact Information</legend>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                {{ profile_form.phone }}
+                                {% if profile_form.phone.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.phone.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                {{ profile_form.address }}
+                                {% if profile_form.address.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.address.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City</label>
+                                    {{ profile_form.city }}
+                                    {% if profile_form.city.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in profile_form.city.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">State</label>
+                                    {{ profile_form.state }}
+                                    {% if profile_form.state.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in profile_form.state.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">ZIP Code</label>
+                                    {{ profile_form.zip_code }}
+                                    {% if profile_form.zip_code.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in profile_form.zip_code.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Date of Birth</label>
+                                {{ profile_form.date_of_birth }}
+                                {% if profile_form.date_of_birth.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.date_of_birth.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Profile Picture</label>
+                                {{ profile_form.profile_picture }}
+                                {% if profile_form.profile_picture.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.profile_picture.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </fieldset>
+                        
+                        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'saved_addresses' %}" class="btn btn-outline-primary btn-block w-100 mb-2">
+                        <i class="fas fa-map-marker-alt"></i> Saved Addresses
+                    </a>
+                    
+                    <a href="{% url 'customer_bookings' %}" class="btn btn-outline-info btn-block w-100">
+                        <i class="fas fa-calendar"></i> My Bookings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+<!-- templates/cleaning/customer/payments.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}Payment History - Clean Pro{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Payment History</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Total Amount Paid: <span class="text-success">${{ total_paid }}</span></h5>
+        </div>
+    </div>
+    
+    {% if payments %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.service.name }}</td>
+                <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                <td>${{ payment.amount }}</td>
+                <td><span class="badge bg-success">Paid</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">No payments yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

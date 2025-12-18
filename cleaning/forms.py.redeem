@@ -1,0 +1,4 @@
+from django import forms
+
+class RedeemForm(forms.Form):
+    redemption_key = forms.CharField(widget=forms.HiddenInput)

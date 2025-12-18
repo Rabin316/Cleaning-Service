@@ -1,7 +1,7 @@
 <!-- templates/cleaning/home.html -->
 {% extends 'cleaning/base.html' %}
 
-{% block title %}Clean Pro Services - Professional Cleaning for Homes & Offices{% endblock %}
+{% block title %}Clean Pro - Professional Cleaning for Homes & Offices{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -98,6 +98,83 @@
     .service-icon {
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .service-icon i {
+        font-size: 4rem;
+        color: white;
+        opacity: 0.9;
+        z-index: 1;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    
+    .service-card:hover .service-icon i {
+        transform: scale(1.15) rotate(5deg);
+        opacity: 1;
+    }
+    
+    .service-body {
+        padding: 2rem;
+    }
+    
+    .service-card h4 {
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .service-card p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+    
+    .service-price {
+        color: var(--primary-color);
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .hero {
+            padding: 60px 0;
+        }
+        
+        .hero h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .features {
+            padding: 60px 0;
+        }
+        
+        .feature-card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .services {
+            padding: 60px 0;
+        }
+    }
         text-align: center;
     }
     
@@ -199,9 +276,38 @@
         padding: 1rem 3rem;
         font-size: 1.1rem;
     }
+    /* Auth buttons (hero & CTA) */
+    .auth-btn {
+        border-radius: 999px;
+        padding: 0.6rem 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+    .auth-btn-filled {
+        background: white;
+        color: var(--primary-color);
+        border: none;
+        box-shadow: 0 8px 24px rgba(2,6,23,0.12);
+    }
+    .auth-btn-filled:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 38px rgba(2,6,23,0.16);
+    }
+    .auth-btn-outline {
+        background: transparent;
+        color: white;
+        border: 1px solid rgba(255,255,255,0.18);
+    }
+    .auth-btn-outline:hover {
+        background: rgba(255,255,255,0.05);
+    }
 </style>
 {% endblock %}
 
+{% load icon_utils %}
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
@@ -210,12 +316,14 @@
             <div class="col-lg-6 hero-content">
                 <h1>Sparkling Clean Spaces, Every Time</h1>
                 <p>Professional cleaning services for your home and office. We bring excellence to every corner.</p>
-                <a href="{% url 'booking' %}" class="btn btn-light btn-lg me-3">
-                    <i class="fas fa-calendar-check me-2"></i>Book Now
-                </a>
-                <a href="{% url 'services' %}" class="btn btn-outline-light btn-lg">
-                    View Services
-                </a>
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <a href="{% url 'booking' %}" class="btn auth-btn auth-btn-filled btn-lg" aria-label="Book a cleaning">
+                        <i class="fas fa-calendar-check me-2"></i>Book Now
+                    </a>
+                    <a href="{% url 'services' %}" class="btn auth-btn auth-btn-filled btn-lg" aria-label="View services">
+                        <i class="fas fa-th-list me-2"></i>View Services
+                    </a>
+                </div>
             </div>
             <div class="col-lg-6 text-center">
                 <i class="fas fa-home" style="font-size: 15rem; opacity: 0.2;"></i>
@@ -284,7 +392,7 @@
             <div class="col-md-6 col-lg-4">
                 <div class="service-card">
                     <div class="service-icon">
-                        <i class="{{ service.icon }}"></i>
+                        <i class="{{ service.icon|normalize_icon }}"></i>
                     </div>
                     <div class="service-body">
                         <h4>{{ service.name }}</h4>
@@ -385,9 +493,11 @@
     <div class="container">
         <h2>Ready for a Spotless Space?</h2>
         <p class="lead mb-4">Book your professional cleaning service today and experience the difference!</p>
-        <a href="{% url 'booking' %}" class="btn btn-light btn-lg">
-            <i class="fas fa-calendar-check me-2"></i>Schedule Now
-        </a>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{% url 'booking' %}" class="btn auth-btn auth-btn-filled">
+                <i class="fas fa-calendar-check me-2"></i>Schedule Now
+            </a>
+        </div>
     </div>
 </section>
 {% endblock %}

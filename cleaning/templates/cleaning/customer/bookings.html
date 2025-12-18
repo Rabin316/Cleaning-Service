@@ -1,0 +1,80 @@
+<!-- templates/cleaning/customer/bookings.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}My Bookings - Clean Pro{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>My Bookings</h2>
+    
+    {% if upcoming_bookings or past_bookings %}
+    
+    {% if upcoming_bookings %}
+    <h4 class="mt-4">Upcoming Bookings</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in upcoming_bookings %}
+            <tr>
+                <td>{{ booking.service.name }}</td>
+                <td>{{ booking.preferred_date }}</td>
+                <td>{{ booking.preferred_time }}</td>
+                <td>
+                    <span class="badge bg-{% if booking.status == 'completed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}info{% endif %}">
+                        {{ booking.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-primary">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    {% if past_bookings %}
+    <h4 class="mt-4">Past Bookings</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in past_bookings %}
+            <tr>
+                <td>{{ booking.service.name }}</td>
+                <td>{{ booking.preferred_date }}</td>
+                <td>{{ booking.preferred_time }}</td>
+                <td>
+                    <span class="badge bg-{% if booking.status == 'completed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}info{% endif %}">
+                        {{ booking.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-primary">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    {% else %}
+    <div class="alert alert-info">You haven't made any bookings yet. <a href="{% url 'services' %}">Browse services</a></div>
+    {% endif %}
+</div>
+{% endblock %}

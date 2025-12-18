@@ -1,0 +1,155 @@
+<!-- templates/cleaning/customer/booking_detail.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}Booking Details - Clean Pro{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .container.my-5 {
+            margin-top: 1rem !important;
+            margin-bottom: 1rem !important;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .row > div {
+            margin-bottom: 1.5rem;
+        }
+        
+        .col-md-6,
+        .col-lg-8,
+        .col-lg-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        
+        .card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header h4,
+        .card-header h5 {
+            font-size: 1.1rem;
+        }
+        
+        .d-flex.gap-2 {
+            flex-direction: column;
+            gap: 0.5rem !important;
+        }
+        
+        .btn,
+        button.btn {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        form {
+            display: block;
+            width: 100%;
+        }
+        
+        .row {
+            flex-direction: column;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Booking #{{ booking.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Service:</h6>
+                            <p>{{ booking.service.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Status:</h6>
+                            <p><span class="badge bg-info">{{ booking.get_status_display }}</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Date:</h6>
+                            <p>{{ booking.preferred_date }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Time:</h6>
+                            <p>{{ booking.preferred_time }}</p>
+                        </div>
+                    </div>
+                    
+                    <h6>Address:</h6>
+                    <p>{{ booking.address }}</p>
+                    
+                    <h6>Special Instructions:</h6>
+                    <p>{{ booking.special_instructions|default:"None" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Actions</h5>
+                </div>
+                <div class="card-body">
+                    {% if booking.status != 'completed' and booking.status != 'cancelled' %}
+                    <button type="button" class="btn btn-danger btn-block w-100 mb-2" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                        <i class="fas fa-times"></i> Cancel Booking
+                    </button>
+                    {% endif %}
+                    
+                    {% if booking.status == 'completed' %}
+                    <a href="{% url 'rebook' booking.id %}" class="btn btn-primary btn-block w-100">
+                        <i class="fas fa-redo"></i> Rebook Service
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cancel Booking Modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Cancel Booking</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this booking for <strong>{{ booking.service.name }}</strong> on <strong>{{ booking.preferred_date }}</strong>?</p>
+                    <p class="text-muted small">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
+                    <form method="post" action="{% url 'cancel_booking' booking.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Yes, Cancel Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}

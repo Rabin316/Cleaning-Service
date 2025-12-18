@@ -1,0 +1,540 @@
+<!-- templates/cleaning/customer/dashboard.html -->
+{% extends 'cleaning/base.html' %}
+
+{% block title %}Dashboard - Clean Pro{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .welcome-card {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        flex-shrink: 0;
+    }
+    
+    .tier-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    
+    .tier-bronze { background: #cd7f32; color: white; }
+    .tier-silver { background: #c0c0c0; color: #333; }
+    .tier-gold { background: #ffd700; color: #333; }
+    .tier-platinum { background: #e5e4e2; color: #333; }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+    
+    .section-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--light-color);
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin: 0;
+    }
+    
+    .booking-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 10px;
+        background: var(--light-color);
+        margin-bottom: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .booking-item:hover {
+        background: #e2e8f0;
+    }
+    
+    .booking-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .booking-details {
+        flex-grow: 1;
+    }
+    
+    .booking-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 0.25rem;
+    }
+    
+    .booking-meta {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+    
+    .booking-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-confirmed { background: #d1fae5; color: #065f46; }
+    .status-completed { background: #dbeafe; color: #1e40af; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    
+    .notification-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid var(--light-color);
+    }
+    
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+    
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--light-color);
+        color: var(--primary-color);
+        flex-shrink: 0;
+    }
+    
+    .notification-content {
+        flex-grow: 1;
+    }
+    
+    .notification-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 0.25rem;
+    }
+    
+    .notification-text {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .notification-time {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+    
+    .favorite-card {
+        text-align: center;
+        padding: 1.5rem;
+        border: 2px solid var(--light-color);
+        border-radius: 10px;
+        transition: all 0.3s;
+        height: 100%;
+    }
+    
+    .favorite-card:hover {
+        border-color: var(--primary-color);
+        background: var(--light-color);
+    }
+    
+    .favorite-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .welcome-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+        }
+
+        .section-card {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary.btn-lg,
+        .btn-outline-primary.btn-lg {
+            width: 100%;
+            margin-bottom: 0.75rem;
+            margin-right: 0 !important;
+            padding: 0.6rem 1rem;
+        }
+
+        .favorite-card {
+            padding: 1rem;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        
+        .booking-item {
+            flex-wrap: wrap;
+            padding: 0.75rem;
+        }
+        
+        .booking-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+            margin-right: 0.75rem;
+        }
+        
+        .booking-details {
+            flex-basis: 100%;
+        }
+        
+        .booking-status {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+        }
+        
+        .notification-item {
+            padding: 0.75rem 0;
+            gap: 0.75rem;
+        }
+        
+        .notification-icon {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+        
+        .favorite-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+        
+        .col-lg-8,
+        .col-lg-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% load icon_utils %}
+<!-- Dashboard Header -->
+<section class="dashboard-header">
+    <div class="container">
+        <div class="welcome-card">
+            <div class="profile-avatar">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" alt="{{ user.get_full_name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                {% else %}
+                    {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+                {% endif %}
+            </div>
+            <div>
+                <h1 class="mb-2">Welcome back, {{ user.first_name }}!</h1>
+                <p class="mb-0">Ready for your next cleaning service?</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-4">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <i class="fas fa-calendar-check" style="color: white;"></i>
+                </div>
+                <div class="stat-value">{{ stats.total_bookings }}</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="fas fa-clock" style="color: white;"></i>
+                </div>
+                <div class="stat-value">{{ stats.upcoming_count }}</div>
+                <div class="stat-label">Upcoming Services</div>
+            </div>
+            
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    <i class="fas fa-dollar-sign" style="color: white;"></i>
+                </div>
+                <div class="stat-value">${{ stats.total_spent|floatformat:0 }}</div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="text-center mb-4">
+            <a href="{% url 'booking' %}" class="btn btn-primary btn-lg me-2">
+                <i class="fas fa-plus me-2"></i>New Booking
+            </a>
+            <a href="{% url 'customer_bookings' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-list me-2"></i>View All Bookings
+            </a>
+        </div>
+        
+        <div class="row">
+            <!-- Upcoming Bookings -->
+            <div class="col-lg-8">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Upcoming Bookings</h2>
+                        <a href="{% url 'customer_bookings' %}" class="text-primary">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                    
+                    {% if upcoming_bookings %}
+                        {% for booking in upcoming_bookings %}
+                        <div class="booking-item">
+                            <div class="booking-icon">
+                                <i class="{{ booking.service.icon|normalize_icon }}"></i>
+                            </div>
+                            <div class="booking-details">
+                                <div class="booking-title">{{ booking.service.name }}</div>
+                                <div class="booking-meta">
+                                    <i class="far fa-calendar me-2"></i>{{ booking.preferred_date|date:"M d, Y" }}
+                                    <i class="far fa-clock ms-3 me-2"></i>{{ booking.preferred_time|time:"g:i A" }}
+                                </div>
+                            </div>
+                            <span class="booking-status status-{{ booking.status }}">
+                                {{ booking.get_status_display }}
+                            </span>
+                            <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary ms-2">
+                                Details
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="far fa-calendar-times" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                            <p class="text-muted mb-3">No upcoming bookings</p>
+                            <a href="{% url 'booking' %}" class="btn btn-primary">Book a Service</a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Bookings</h2>
+                        <a href="{% url 'customer_bookings' %}" class="text-primary">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                    
+                    {% for booking in recent_bookings %}
+                    <div class="booking-item">
+                        <div class="booking-icon">
+                            <i class="{{ booking.service.icon|normalize_icon }}"></i>
+                        </div>
+                        <div class="booking-details">
+                            <div class="booking-title">{{ booking.service.name }}</div>
+                            <div class="booking-meta">
+                                <i class="far fa-calendar me-2"></i>{{ booking.preferred_date|date:"M d, Y" }}
+                            </div>
+                        </div>
+                        <span class="booking-status status-{{ booking.status }}">
+                            {{ booking.get_status_display }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Notifications -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Notifications</h2>
+                        <a href="{% url 'notifications' %}" class="text-primary">View All</a>
+                    </div>
+                    
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                        <div class="notification-item">
+                            <div class="notification-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">{{ notification.title }}</div>
+                                <div class="notification-text">{{ notification.message|truncatewords:15 }}</div>
+                                <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">No new notifications</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Favorite Services -->
+                {% if favorite_services %}
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">Quick Book</h2>
+                        <a href="{% url 'favorite_services' %}" class="text-primary">Manage</a>
+                    </div>
+                    
+                    <div class="row g-3">
+                        {% for favorite in favorite_services %}
+                        <div class="col-6">
+                            <a href="{% url 'quick_booking' favorite.service.id %}" class="text-decoration-none">
+                                <div class="favorite-card">
+                                    <div class="favorite-icon">
+                                        <i class="{{ favorite.service.icon|normalize_icon }}"></i>
+                                    </div>
+                                    <div class="fw-bold">{{ favorite.service.name }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Account Menu -->
+                <div class="section-card">
+                    <h2 class="section-title mb-3">Account</h2>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'customer_profile' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user me-2"></i>Profile Settings
+                        </a>
+                        <a href="{% url 'saved_addresses' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-map-marker-alt me-2"></i>Saved Addresses
+                        </a>
+                        <a href="{% url 'payment_history' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-credit-card me-2"></i>Payment History
+                        </a>
+                        
+                        <a href="{% url 'customer_logout' %}" class="list-group-item list-group-item-action text-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

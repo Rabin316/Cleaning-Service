@@ -1,7 +1,7 @@
 <!-- templates/cleaning/service_detail.html -->
 {% extends 'cleaning/base.html' %}
 
-{% block title %}{{ service.name }} - Clean Pro Services{% endblock %}
+{% block title %}{{ service.name }} - Clean Pro{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -129,6 +129,7 @@
 </style>
 {% endblock %}
 
+{% load icon_utils %}
 {% block content %}
 <!-- Service Hero -->
 <section class="service-hero">
@@ -151,7 +152,7 @@
                 </div>
             </div>
         </div>
-        <i class="{{ service.icon }} service-icon-large"></i>
+        <i class="{{ service.icon|normalize_icon }} service-icon-large"></i>
     </div>
 </section>
 
@@ -223,7 +224,7 @@
             <div class="col-lg-4">
                 <div class="related-card">
                     <div class="related-icon">
-                        <i class="{{ related.icon }}"></i>
+                        <i class="{{ related.icon|normalize_icon }}"></i>
                     </div>
                     <h4>{{ related.name }}</h4>
                     <p class="text-muted mb-3">{{ related.short_description|truncatewords:15 }}</p>
