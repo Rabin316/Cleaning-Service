@@ -1,4 +1,4 @@
-# Dockerfile for Clean Pro - Railway Production
+# Dockerfile for Clean Pro - Django + Railway
 
 FROM python:3.12-slim
 
@@ -16,10 +16,9 @@ RUN apt-get update \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Python requirements
+# Install Python dependencies
 COPY requirements.txt .
 
-# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
@@ -27,26 +26,18 @@ RUN pip install --no-cache-dir --upgrade pip \
 RUN groupadd -r appuser \
     && useradd -r -g appuser appuser
 
-# Create application directories
-RUN mkdir -p /app/logs \
-    /app/staticfiles \
-    /app/media
-
-# Copy application
+# Copy Django project
 COPY . .
 
-# Copy startup script
-COPY start.sh /app/start.sh
-
-# Set permissions
-RUN chmod +x /app/start.sh \
+# Create required directories
+RUN mkdir -p /app/logs /app/staticfiles /app/media \
     && chown -R appuser:appuser /app
 
-# Use non-root user
+# Switch to non-root user
 USER appuser
 
-# Default port
+# Railway assigns the actual port at runtime
 EXPOSE 8000
 
-# Start application
-CMD ["/app/start.sh"]
+# Start Gunicorn
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 4 --preload config.wsgi:application"]
