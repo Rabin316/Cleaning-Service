@@ -1,7 +1,8 @@
-# Dockerfile for Clean Pro - Production-Ready Django Application
+# Dockerfile for Clean Pro - Railway Production
+
 FROM python:3.12-slim
 
-# Set work directory
+# Set working directory
 WORKDIR /app
 
 # Install system dependencies
@@ -15,9 +16,10 @@ RUN apt-get update \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy Python requirements
 COPY requirements.txt .
 
+# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
@@ -25,21 +27,26 @@ RUN pip install --no-cache-dir --upgrade pip \
 RUN groupadd -r appuser \
     && useradd -r -g appuser appuser
 
-# Create required directories
-RUN mkdir -p /app/logs /app/staticfiles /app/media \
-    && chown -R appuser:appuser /app
+# Create application directories
+RUN mkdir -p /app/logs \
+    /app/staticfiles \
+    /app/media
 
-# Copy project
+# Copy application
 COPY . .
 
-# Ensure appuser owns application files
-RUN chown -R appuser:appuser /app
+# Copy startup script
+COPY start.sh /app/start.sh
 
-# Switch to non-root user
+# Set permissions
+RUN chmod +x /app/start.sh \
+    && chown -R appuser:appuser /app
+
+# Use non-root user
 USER appuser
 
-# Expose default application port
+# Default port
 EXPOSE 8000
 
-# Start Gunicorn
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 4 --preload config.wsgi:application"]
+# Start application
+CMD ["/app/start.sh"]
