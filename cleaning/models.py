@@ -232,6 +232,14 @@ class Booking(models.Model):
         ],
         default='pending'
     )
+    payment_method = models.CharField(
+        max_length=20,
+        choices=[
+            ('card', 'Card'),
+            ('cash_on_delivery', 'Cash on delivery'),
+        ],
+        default='card',
+    )
     payment_intent_id = models.CharField(max_length=255, blank=True, help_text="Stripe Payment Intent ID")
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Amount actually paid")

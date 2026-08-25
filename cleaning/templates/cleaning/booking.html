@@ -267,6 +267,20 @@
                             </div>
 
                             <div class="col-md-12">
+                                <fieldset class="mb-2">
+                                    <legend class="form-label">Payment Method</legend>
+                                    <div id="payment-method-options" class="d-flex gap-4">
+                                        {% for choice in form.payment_method %}
+                                            <div class="form-check">
+                                                {{ choice.tag }}
+                                                <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <div class="col-md-12" id="card-payment-section">
                                 <div id="payment-element">
                                     <!-- Stripe Element will be inserted here by JavaScript -->
                                 </div>
@@ -333,18 +347,31 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Stripe Elements
-    const stripe = Stripe('{{ stripe_publishable_key }}');
-    const elements = stripe.elements();
-
-    // Create payment element
-    const paymentElement = elements.create('payment');
-    paymentElement.mount('#payment-element');
-
-    // Handle form submission
+    let stripe = null;
+    let elements = null;
+    const stripePublishableKey = '{{ stripe_publishable_key }}';
     const form = document.getElementById('booking-form');
     const submitButton = document.getElementById('submit-button');
     const paymentMessage = document.getElementById('payment-message');
+    const cardPaymentSection = document.getElementById('card-payment-section');
+    const paymentMethodInputs = document.querySelectorAll('input[name="payment_method"]');
+
+    function updatePaymentMethod() {
+        const selected = document.querySelector('input[name="payment_method"]:checked');
+        cardPaymentSection.classList.toggle('d-none', selected && selected.value !== 'card');
+        if (selected && selected.value === 'card' && !stripe) {
+            if (!stripePublishableKey) {
+                paymentMessage.textContent = 'Card payment is not configured. Please choose cash on delivery.';
+                paymentMessage.className = 'mt-3 text-danger';
+                return;
+            }
+            stripe = Stripe(stripePublishableKey);
+            elements = stripe.elements();
+            elements.create('payment').mount('#payment-element');
+        }
+    }
+    paymentMethodInputs.forEach((input) => input.addEventListener('change', updatePaymentMethod));
+    updatePaymentMethod();
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -369,6 +396,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = contentType.includes('application/json')
                 ? await response.json()
                 : {};
+            if (data.success && data.redirect_url) {
+                window.location.href = data.redirect_url;
+                return;
+            }
             if (!response.ok || !data.success || !data.client_secret) {
                 throw new Error(data.error || 'Unable to start payment. Please check the form and try again.');
             }

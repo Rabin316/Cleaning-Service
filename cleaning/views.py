@@ -4,6 +4,7 @@ Includes customer authentication, dashboard, booking management,
 and Stripe payment integration.
 """
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -93,7 +94,17 @@ def booking(request):
             booking.save()
             request.session.pop('rebook_data', None)
 
-            # Create Stripe payment intent for non-DEBUG mode
+            if booking.payment_method == 'cash_on_delivery':
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'booking_id': booking.id,
+                        'redirect_url': reverse('booking_success'),
+                    })
+                messages.success(request, 'Your booking has been received. Please pay in cash after the service.')
+                return redirect('booking_success')
+
+            # Create Stripe payment intent for card payments in production.
             if not settings.DEBUG and booking.amount and booking.amount > 0:
                 try:
                     intent = create_payment_intent(booking)
@@ -106,7 +117,7 @@ def booking(request):
                     })
                 except Exception:
                     logger.exception('Payment processing failed for booking_id=%s', booking.id)
-                    messages.error(request, 'Payment processing error. Please try again.')
+                    messages.error(request, 'Card payment is temporarily unavailable. Choose cash on delivery or try again later.')
                     return render(request, 'cleaning/booking.html', {
                         'form': form,
                         'services': Service.objects.filter(is_active=True),
@@ -602,6 +613,16 @@ def quick_booking(request, service_id):
             booking.phone = profile.phone
             booking.amount = service.price_starting
             booking.save()
+
+            if booking.payment_method == 'cash_on_delivery':
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'booking_id': booking.id,
+                        'redirect_url': reverse('booking_detail', args=[booking.id]),
+                    })
+                messages.success(request, 'Your booking has been received. Please pay in cash after the service.')
+                return redirect('booking_detail', booking_id=booking.id)
 
             if not settings.DEBUG and booking.amount > 0:
                 try:

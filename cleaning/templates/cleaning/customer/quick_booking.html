@@ -40,11 +40,26 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const stripe = Stripe('{{ stripe_publishable_key }}');
-    const elements = stripe.elements();
-    const paymentElement = elements.create('payment');
-    paymentElement.mount('#payment-element');
+    let stripe = null;
+    let elements = null;
+    const stripePublishableKey = '{{ stripe_publishable_key }}';
     const form = document.getElementById('quick-booking-form');
+    const paymentElementContainer = document.getElementById('payment-element');
+    const paymentMethodInputs = document.querySelectorAll('input[name="payment_method"]');
+
+    function updatePaymentMethod() {
+        const selected = document.querySelector('input[name="payment_method"]:checked');
+        const isCard = !selected || selected.value === 'card';
+        paymentElementContainer.classList.toggle('d-none', !isCard);
+        if (isCard && !stripe && stripePublishableKey) {
+            stripe = Stripe(stripePublishableKey);
+            elements = stripe.elements();
+            elements.create('payment').mount('#payment-element');
+        }
+    }
+    paymentMethodInputs.forEach((input) => input.addEventListener('change', updatePaymentMethod));
+    updatePaymentMethod();
+
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
         const response = await fetch(form.action || window.location.href, {
@@ -53,6 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
             body: new FormData(form)
         });
         const data = await response.json();
+        if (data.success && data.redirect_url) {
+            window.location.href = data.redirect_url;
+            return;
+        }
         if (!response.ok || !data.client_secret) {
             throw new Error(data.error || 'Unable to start payment.');
         }

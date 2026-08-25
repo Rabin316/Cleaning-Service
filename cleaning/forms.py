@@ -4,10 +4,24 @@ from .models import Booking
 
 class BookingForm(forms.ModelForm):
     """Form for booking services"""
+    payment_method = forms.ChoiceField(
+        choices=[
+            ('card', 'Pay securely by card'),
+            ('cash_on_delivery', 'Cash on delivery'),
+        ],
+        widget=forms.RadioSelect,
+        initial='card',
+        required=False,
+        label='Payment method',
+    )
+
+    def clean_payment_method(self):
+        return self.cleaned_data.get('payment_method') or 'card'
+
     class Meta:
         model = Booking
         fields = ['service', 'name', 'email', 'phone', 'address', 
-                  'preferred_date', 'preferred_time', 'frequency', 'special_instructions']
+                  'preferred_date', 'preferred_time', 'frequency', 'special_instructions', 'payment_method']
         widgets = {
             'service': forms.Select(attrs={
                 'class': 'form-control',

@@ -106,6 +106,17 @@ class ApplicationRegressionTests(TestCase):
 		self.assertEqual(response.json()['client_secret'], 'secret_test')
 		create_intent.assert_called_once()
 
+	@override_settings(DEBUG=False, STRIPE_SECRET_KEY='')
+	def test_cash_on_delivery_booking_skips_stripe(self):
+		data = self.booking_data(self.service)
+		data['payment_method'] = 'cash_on_delivery'
+		response = self.client.post(reverse('booking'), data)
+		self.assertRedirects(response, reverse('booking_success'))
+		booking = Booking.objects.latest('id')
+		self.assertEqual(booking.payment_method, 'cash_on_delivery')
+		self.assertEqual(booking.payment_status, 'pending')
+		self.assertEqual(booking.amount_paid, Decimal('0'))
+
 	def test_custom_admin_urls_reverse(self):
 		self.assertEqual(reverse('admin:dashboard'), '/admin/dashboard/')
 		self.assertEqual(reverse('admin:dashboard_team_schedule'), '/admin/dashboard/team-schedule/')
