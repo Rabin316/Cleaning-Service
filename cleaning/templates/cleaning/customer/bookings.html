@@ -28,7 +28,7 @@
                 <td>{{ booking.preferred_date }}</td>
                 <td>{{ booking.preferred_time }}</td>
                 <td>
-                    <span class="badge bg-{% if booking.status == 'completed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}info{% endif %}">
+                        <span class="badge {% if booking.status == 'pending' %}bg-warning text-dark{% elif booking.status == 'confirmed' %}bg-info{% elif booking.status == 'completed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
                         {{ booking.get_status_display }}
                     </span>
                 </td>
@@ -60,7 +60,7 @@
                 <td>{{ booking.preferred_date }}</td>
                 <td>{{ booking.preferred_time }}</td>
                 <td>
-                    <span class="badge bg-{% if booking.status == 'completed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}info{% endif %}">
+                    <span class="badge {% if booking.status == 'pending' %}bg-warning text-dark{% elif booking.status == 'confirmed' %}bg-info{% elif booking.status == 'completed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
                         {{ booking.get_status_display }}
                     </span>
                 </td>

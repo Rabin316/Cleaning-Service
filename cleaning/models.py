@@ -194,33 +194,33 @@ class Booking(models.Model):
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
     ]
-    
+
     FREQUENCY_CHOICES = [
         ('one_time', 'One Time'),
         ('weekly', 'Weekly'),
         ('biweekly', 'Bi-Weekly'),
         ('monthly', 'Monthly'),
     ]
-    
+
     # Link to user (for authenticated customers)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='bookings')
-    
+
     # Service and basic info
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
     address = models.TextField()
-    
+
     # Scheduling
     preferred_date = models.DateField()
     preferred_time = models.TimeField()
     frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, default='one_time')
-    
+
     # Additional info
     special_instructions = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    
+
     # Payment
     payment_status = models.CharField(
         max_length=20,
@@ -232,26 +232,29 @@ class Booking(models.Model):
         ],
         default='pending'
     )
-    payment_intent_id = models.CharField(max_length=255, blank=True)
+    payment_intent_id = models.CharField(max_length=255, blank=True, help_text="Stripe Payment Intent ID")
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Amount actually paid")
+    currency = models.CharField(max_length=3, default='usd', help_text="Currency code (usd, eur, etc.)")
+    stripe_charge_id = models.CharField(max_length=255, blank=True, help_text="Stripe Charge ID after payment")
+
     # Ratings & Review
     customer_rating = models.IntegerField(
-        null=True, 
+        null=True,
         blank=True,
         choices=[(i, i) for i in range(1, 6)]
     )
     customer_review = models.TextField(blank=True)
-    
+
     # Assignment
     assigned_to = models.ForeignKey(
-        TeamMember, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+        TeamMember,
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
         related_name='assigned_bookings'
     )
-    
+
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

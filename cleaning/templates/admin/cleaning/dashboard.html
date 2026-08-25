@@ -1,0 +1,186 @@
+{% extends "admin/base_site.html" %}
+{% load static i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" />
+{% endblock %}
+
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{% trans 'Operations Dashboard' %}</h1>
+
+    {% if user.is_superuser %}
+    <div class="module">
+        <table width="100%" cellspacing="0">
+        <thead>
+        <tr>
+            <th colspan="3">{% trans 'Key Metrics' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="metric">
+                <h2>{{ total_bookings }}</h2>
+                <div>{% trans 'Total Bookings' %}</div>
+            </td>
+            <td class="metric">
+                <h2 style="color: #ffc107;">{{ pending_bookings }}</h2>
+                <div>{% trans 'Pending' %}</div>
+            </td>
+            <td class="metric">
+                <h2 style="color: #17a2b8;">{{ confirmed_bookings }}</h2>
+                <div>{% trans 'Confirmed' %}</div>
+            </td>
+            <td class="metric">
+                <h2 style="color: #28a745;">{{ upcoming_bookings }}</h2>
+                <div>{% trans 'Upcoming' %}</div>
+            </td>
+            <td class="metric">
+                <h2 style="color: #28a745;">${{ total_revenue|floatformat:2 }}</h2>
+                <div>{% trans 'Total Revenue' %}</div>
+            </td>
+        </tr>
+        </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <div class="module">
+        <h2>{% trans 'Today\'s Schedule' %}</h2>
+        {% if today_bookings %}
+        <table>
+        <thead>
+        <tr>
+            <th>{% trans 'Time' %}</th>
+            <th>{% trans 'Customer' %}</th>
+            <th>{% trans 'Service' %}</th>
+            <th>{% trans 'Address' %}</th>
+            <th>{% trans 'Assigned To' %}</th>
+            <th>{% trans 'Status' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for booking in today_bookings %}
+        <tr class="{% if booking.status == 'confirmed' %}row-confirmed{% elif booking.status == 'pending' %}row-pending{% endif %}">
+            <td>{{ booking.preferred_time|time:"H:i" }}</td>
+            <td>
+                <a href="{% url 'admin:cleaning_booking_change' booking.id %}">{{ booking.name }}</a>
+                {% if booking.user %}<br><small>{{ booking.user.email }}</small>{% endif %}
+            </td>
+            <td>{{ booking.service.name }}</td>
+            <td title="{{ booking.address }}">{{ booking.address|truncatechars:30 }}</td>
+            <td>
+                {% if booking.assigned_to %}
+                    <a href="{% url 'admin:cleaning_teammember_change' booking.assigned_to.id %}">
+                        {{ booking.assigned_to.name }}
+                    </a>
+                {% else %}
+                    <span class="text-muted">{% trans 'Unassigned' %}</span>
+                {% endif %}
+            </td>
+            <td>
+                <span class="status-badge status-{{ booking.status }}">
+                    {{ booking.get_status_display }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+        {% else %}
+        <p>{% trans 'No bookings scheduled for today.' %}</p>
+        {% endif %}
+    </div>
+
+    <div class="module">
+        <h2>{% trans 'Recent Activity' %}</h2>
+        {% if recent_bookings %}
+        <table class="recent-activity">
+        <thead>
+        <tr>
+            <th>{% trans 'Booking' %}</th>
+            <th>{% trans 'Service' %}</th>
+            <th>{% trans 'Status' %}</th>
+            <th>{% trans 'Date' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for booking in recent_bookings %}
+        <tr>
+            <td>
+                <a href="{% url 'admin:cleaning_booking_change' booking.id %}">#{{ booking.id }} - {{ booking.name }}</a>
+                <br><small>{{ booking.email }}</small>
+            </td>
+            <td>{{ booking.service.name }}</td>
+            <td>
+                <span class="status-badge status-{{ booking.status }}">
+                    {{ booking.get_status_display }}
+                </span>
+            </td>
+            <td>{{ booking.preferred_date|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+        {% else %}
+        <p>{% trans 'No recent activity.' %}</p>
+        {% endif %}
+    </div>
+
+    <div class="module">
+        <h2>{% trans 'Popular Services' %}</h2>
+        {% if popular_services %}
+        <ul>
+        {% for service in popular_services %}
+        <li>
+            <strong>{{ service.name }}</strong>
+            <span class="count">({{ service.booking_count }} bookings)</span>
+            <br>
+            <small>${{ service.price_starting }} starting</small>
+        </li>
+        {% endfor %}
+        </ul>
+        {% else %}
+        <p>{% trans 'No services available.' %}</p>
+        {% endif %}
+    </div>
+
+    <div class="module">
+        <h2>{% trans 'Quick Actions' %}</h2>
+        <ul class="action-list">
+            <li>
+                <a href="{% url 'admin:cleaning_booking_changelist' %}" class="button">
+                    {% trans 'Manage All Bookings' %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin:cleaning_teammember_changelist' %}" class="button">
+                    {% trans 'Manage Team' %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin:cleaning_service_changelist' %}" class="button">
+                    {% trans 'Manage Services' %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin:dashboard_team_schedule' %}" class="button">
+                    {% trans 'View Team Schedule' %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin:dashboard_revenue' %}" class="button">
+                    {% trans 'Revenue Reports' %}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

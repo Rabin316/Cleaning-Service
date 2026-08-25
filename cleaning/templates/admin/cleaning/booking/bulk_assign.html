@@ -1,0 +1,85 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .bulk-form { max-width: 500px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 4px; }
+    .bulk-form h2 { margin-top: 0; }
+    .bulk-form .form-row { margin-bottom: 15px; }
+    .bulk-form label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .bulk-form select, .bulk-form input[type="checkbox"] { width: 100%; padding: 8px; box-sizing: border-box; }
+    .bulk-form .submit-row { text-align: center; margin-top: 20px; }
+    .bulk-form .help-text { font-size: 0.9em; color: #666; margin-top: 5px; }
+</style>
+{% endblock %}
+
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label='cleaning' %}">Cleaning</a>
+&rsaquo; <a href="{% url 'admin:cleaning_booking_changelist' %}">{% trans 'Bookings' %}</a>
+&rsaquo; {% trans 'Assign Team Member' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ title }}</h1>
+
+    <p>{% trans 'Select a team member to assign to the selected bookings:' %}</p>
+
+    <div class="bulk-form">
+        <form method="post">{% csrf_token %}
+            {{ form.as_p }}
+
+            {% if form.send_notification.help_text %}
+            <p class="help-text">{{ form.send_notification.help_text }}</p>
+            {% endif %}
+
+            <div class="submit-row">
+                <input type="submit" value="{% trans 'Assign' %}" class="button" name="apply">
+                <a href="{% url 'admin:cleaning_booking_changelist' %}" class="button cancel-link">{% trans 'Cancel' %}</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="module">
+        <h2>{% trans 'Selected Bookings' %}</h2>
+        <p>{% trans 'You have selected' %} {{ bookings|length }} {% trans 'booking(s).' %}</p>
+
+        {% if bookings %}
+        <table>
+        <thead>
+        <tr>
+            <th>{% trans 'ID' %}</th>
+            <th>{% trans 'Customer' %}</th>
+            <th>{% trans 'Service' %}</th>
+            <th>{% trans 'Date' %}</th>
+            <th>{% trans 'Time' %}</th>
+            <th>{% trans 'Status' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ booking.id }}</td>
+            <td>{{ booking.name }}</td>
+            <td>{{ booking.service.name }}</td>
+            <td>{{ booking.preferred_date }}</td>
+            <td>{{ booking.preferred_time|time:"H:i" }}</td>
+            <td>
+                <span class="status-badge status-{{ booking.status }}">
+                    {{ booking.get_status_display }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

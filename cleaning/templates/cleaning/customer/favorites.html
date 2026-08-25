@@ -17,7 +17,10 @@
                     <p class="card-text">{{ favorite.service.short_description }}</p>
                     <p class="text-success fw-bold">${{ favorite.service.price_starting }}/hour</p>
                     <a href="{% url 'service_detail' favorite.service.slug %}" class="btn btn-primary btn-sm">View</a>
-                    <a href="{% url 'toggle_favorite' favorite.service.id %}" class="btn btn-outline-danger btn-sm">Remove</a>
+                    <form method="post" action="{% url 'toggle_favorite' favorite.service.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -135,15 +135,16 @@
                     
                     <form method="post">
                         {% csrf_token %}
+                        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
                         
                         {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger" role="alert">
                             {{ form.non_field_errors }}
                         </div>
                         {% endif %}
                         
                         <div class="form-group">
-                            <label class="form-label">{{ form.username.label }}</label>
+                            <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
                             {{ form.username }}
                             {% if form.username.errors %}
                                 <div class="text-danger mt-1">{{ form.username.errors.0 }}</div>
@@ -151,7 +152,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">{{ form.password.label }}</label>
+                            <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
                             {{ form.password }}
                             {% if form.password.errors %}
                                 <div class="text-danger mt-1">{{ form.password.errors.0 }}</div>
@@ -174,7 +175,7 @@
                     
                     <div class="auth-footer">
                         <p>Don't have an account? <a href="{% url 'customer_register' %}">Sign up here</a></p>
-                        <p><a href="#">Forgot password?</a></p>
+                        <p class="text-muted">Forgot your password? Please contact support.</p>
                     </div>
                 </div>
             </div>

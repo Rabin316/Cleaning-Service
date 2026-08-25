@@ -12,7 +12,7 @@
                     <h4>Quick Booking for {{ service.name }}</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form id="quick-booking-form" method="post">
                         {% csrf_token %}
                         
                         <div class="mb-3">
@@ -21,6 +21,8 @@
                         </div>
                         
                         {{ form.as_p }}
+
+                        {% if not debug_mode %}<div id="payment-element" class="mb-3"></div>{% endif %}
                         
                         <button type="submit" class="btn btn-primary btn-lg w-100">
                             <i class="fas fa-check"></i> Confirm Booking
@@ -31,4 +33,39 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not debug_mode %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stripe = Stripe('{{ stripe_publishable_key }}');
+    const elements = stripe.elements();
+    const paymentElement = elements.create('payment');
+    paymentElement.mount('#payment-element');
+    const form = document.getElementById('quick-booking-form');
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const response = await fetch(form.action || window.location.href, {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            body: new FormData(form)
+        });
+        const data = await response.json();
+        if (!response.ok || !data.client_secret) {
+            throw new Error(data.error || 'Unable to start payment.');
+        }
+        const result = await stripe.confirmPayment({
+            clientSecret: data.client_secret,
+            elements,
+            confirmParams: {return_url: `${window.location.origin}/payment/success/?booking_id=${data.booking_id}`},
+            redirect: 'if_required'
+        });
+        if (result.error) { window.alert(result.error.message); return; }
+        window.location.href = `/dashboard/booking/${data.booking_id}/`;
+    });
+});
+</script>
+{% endif %}
 {% endblock %}

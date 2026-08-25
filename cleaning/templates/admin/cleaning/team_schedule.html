@@ -1,0 +1,106 @@
+{% extends "admin/base_site.html" %}
+{% load static i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}" />
+<style>
+    .schedule-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .schedule-table th, .schedule-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    .schedule-table th { background-color: #f8f9fa; font-weight: bold; }
+    .schedule-table tr:nth-child(even) { background-color: #f2f2f2; }
+    .time-slot { min-width: 100px; }
+    .service-name { font-weight: bold; }
+    .customer-name { color: #007bff; }
+    .empty-slot { color: #6c757d; font-style: italic; }
+</style>
+{% endblock %}
+
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:dashboard' %}">{% trans 'Dashboard' %}</a>
+&rsaquo; {% trans 'Team Schedule' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{% trans 'Team Schedule' %}</h1>
+    <p>{% trans 'Schedule for' %} {{ today|date:"F j, Y" }}{% trans ' to ' %}{{ end_date|date:"F j, Y" }}</p>
+
+    {% if schedule %}
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th>{% trans 'Team Member' %}</th>
+                {% for day_offset in "0123456"|make_list %}
+                {% with day=today|add:day_offset %}
+                <th class="time-slot">
+                    {{ day|date:"D" }}<br>{{ day|date:"j" }}
+                </th>
+                {% endwith %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for member_data in schedule %}
+        <tr>
+            <td>
+                <strong>{{ member_data.member.name }}</strong><br>
+                <small>{{ member_data.member.position }}</small>
+                {% if member_data.member.phone %}<br>{{ member_data.member.phone }}{% endif %}
+            </td>
+            {% for day_offset in "0123456"|make_list %}
+            {% with day=today|add:day_offset %}
+            <td class="day-cell">
+                {% for booking in member_data.bookings %}
+                {% if booking.date == day %}
+                <div class="booking-slot">
+                    <div class="time">{{ booking.time|time:"H:i" }}</div>
+                    <div class="service-name">{{ booking.service }}</div>
+                    <div class="customer-name">{{ booking.customer }}</div>
+                    {% if booking.address != booking.address|truncatechars:50 %}
+                    <div class="address" title="{{ booking.address }}">{{ booking.address|truncatechars:50 }}...</div>
+                    {% else %}
+                    <div class="address">{{ booking.address }}</div>
+                    {% endif %}
+                    <div class="status status-{{ booking.status }}">{{ booking.status|title }}</div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% if not member_data.bookings|filter:"date==day"|length %}
+                <div class="empty-slot">{% trans 'Available' %}</div>
+                {% endif %}
+            </td>
+            {% endwith %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>{% trans 'No team members or schedule data available.' %}</p>
+    {% endif %}
+
+    <div class="module">
+        <h2>{% trans 'Legend' %}</h2>
+        <div class="legend">
+            <span class="legend-item">
+                <span class="status status-pending"></span> {% trans 'Pending' %}
+            </span>
+            <span class="legend-item">
+                <span class="status status-confirmed"></span> {% trans 'Confirmed' %}
+            </span>
+            <span class="legend-item">
+                <span class="status status-completed"></span> {% trans 'Completed' %}
+            </span>
+            <span class="legend-item">
+                <span class="empty-slot"></span> {% trans 'Available' %}
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}
