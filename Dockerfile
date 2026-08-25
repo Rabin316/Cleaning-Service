@@ -16,9 +16,10 @@ RUN apt-get update \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy requirements
 COPY requirements.txt .
 
+# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
@@ -30,14 +31,16 @@ RUN groupadd -r appuser \
 COPY . .
 
 # Create required directories
-RUN mkdir -p /app/logs /app/staticfiles /app/media \
+RUN mkdir -p /app/logs \
+    /app/staticfiles \
+    /app/media \
     && chown -R appuser:appuser /app
 
-# Switch to non-root user
+# Use non-root user
 USER appuser
 
-# Railway assigns the actual port at runtime
+# Default port
 EXPOSE 8000
 
-# Start Gunicorn
-CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 4 --preload config.wsgi:application"]
+# Start Django with Gunicorn
+CMD ["sh", "-c", "exec gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120"]
